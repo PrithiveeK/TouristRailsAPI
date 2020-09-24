@@ -17,7 +17,7 @@ class Api::TcController < ApplicationController
                 "conpany_tcs.*, document_types.name as document_type_name,
                 terms_and_conditions.terms as terms"
             ).find(@newTC.id)
-            render json: {code: 201, data tc, msg: 'Created successfully!'}
+            render json: {code: 201, data: tc, msg: 'Created successfully!'}
         else
             render json: {code: 400, msg: 'Invalid Data. Please Try again'}
         end
