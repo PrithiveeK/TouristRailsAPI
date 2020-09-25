@@ -3,6 +3,12 @@ class Api::MasterData::PersonTypesController < ApplicationController
 
     def index
         @pts = PersonType.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @pts = @pts.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @pts = @pts.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @pts}
     end
 

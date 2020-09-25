@@ -3,6 +3,12 @@ class Api::MasterData::MasterChainsController < ApplicationController
 
     def index
         @masterchains = MasterChain.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @masterchains = @masterchains.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @masterchains = @masterchains.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @masterchains}
     end
 

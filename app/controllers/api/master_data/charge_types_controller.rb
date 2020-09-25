@@ -2,7 +2,13 @@ class Api::MasterData::ChargeTypesController < ApplicationController
     # before_action :authorize_request
 
     def index
-        @cts = ChargeType.where(status: 'ACTIVE').order(:id)
+        @cts = ChargeType.where(status: 'ACTIVE')
+        if params[:id]
+            @cts = @cts.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @cts = @cts.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @cts}
     end
 

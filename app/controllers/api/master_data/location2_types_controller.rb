@@ -3,6 +3,12 @@ class Api::MasterData::Location2TypesController < ApplicationController
 
     def index
         @lts = Location2Type.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @lts = @lts.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @lts = @lts.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @lts}
     end
 

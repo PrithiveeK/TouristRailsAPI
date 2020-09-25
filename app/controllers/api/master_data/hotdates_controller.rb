@@ -3,6 +3,12 @@ class Api::MasterData::HotdatesController < ApplicationController
 
     def index
         @hotDates = Hotdate.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @hotdates = @hotdates.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @hotdates = @hotdates.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @hotDates}
     end
 

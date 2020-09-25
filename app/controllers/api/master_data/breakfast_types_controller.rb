@@ -2,7 +2,13 @@ class Api::MasterData::BreakfastTypesController < ApplicationController
     # before_action :authorize_request
 
     def index
-        @breakfasts = BreakfastType.where(status: 'ACTIVE').order(:id)
+        @breakfasts = BreakfastType.where(status: 'ACTIVE')
+        if params[:id]
+            @breakfasts = @breakfasts.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @breakfasts = @breakfasts.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @breakfasts}
     end
 

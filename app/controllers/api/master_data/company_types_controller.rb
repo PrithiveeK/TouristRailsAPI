@@ -3,6 +3,12 @@ class Api::MasterData::CompanyTypesController < ApplicationController
 
     def index
         @companys = CompanyType.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @companys = @companys.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @companys = @companys.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @companys}
     end
 

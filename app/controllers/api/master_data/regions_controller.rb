@@ -3,6 +3,12 @@ class Api::MasterData::RegionsController < ApplicationController
 
     def index
         @regions = Region.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @regions = @regions.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @regions = @regions.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @regions}
     end
 

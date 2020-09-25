@@ -3,6 +3,12 @@ class Api::MasterData::CurrenciesController < ApplicationController
 
     def index
         @currencies = Currency.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @currencies = @currencies.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @currencies = @currencies.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @currencies}
     end
 

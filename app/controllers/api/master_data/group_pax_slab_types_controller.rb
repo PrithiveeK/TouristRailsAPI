@@ -2,8 +2,14 @@ class Api::MasterData::GroupPaxSlabTypesController < ApplicationController
     before_action :authorize_request
 
     def index
-       @gps = GroupPaxSlabType.where(status: 'ACTIVE').order(:id)
-       render json: {code: 200, data: @gps}
+        @gps = GroupPaxSlabType.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @gps = @gps.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @gps = @gps.where("name LIKE ?", "%" + params[:name] + "%")
+        end
+        render json: {code: 200, data: @gps}
     end
     
     def create

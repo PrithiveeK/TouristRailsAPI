@@ -3,6 +3,12 @@ class Api::MasterData::NationalitiesController < ApplicationController
 
     def index
         @nationalities = Nationality.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @nationalities = @nationalities.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @nationalities = @nationalities.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @nationalities}
     end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_24_072758) do
+ActiveRecord::Schema.define(version: 2020_09_25_100733) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -320,6 +320,16 @@ ActiveRecord::Schema.define(version: 2020_09_24_072758) do
     t.index ["name"], name: "index_languages_on_name", unique: true
   end
 
+  create_table "linked_services_mappings", force: :cascade do |t|
+    t.bigint "service_id", null: false
+    t.bigint "linked_service_id", null: false
+    t.string "status", default: "ACTIVE"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["linked_service_id"], name: "index_linked_services_mappings_on_linked_service_id"
+    t.index ["service_id"], name: "index_linked_services_mappings_on_service_id"
+  end
+
   create_table "location2_types", force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
@@ -436,6 +446,26 @@ ActiveRecord::Schema.define(version: 2020_09_24_072758) do
     t.index ["name"], name: "index_room_types_on_name", unique: true
   end
 
+  create_table "service_amenity_mappings", force: :cascade do |t|
+    t.bigint "service_id", null: false
+    t.bigint "amenity_id", null: false
+    t.string "status", default: "ACTIVE"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["amenity_id"], name: "index_service_amenity_mappings_on_amenity_id"
+    t.index ["service_id"], name: "index_service_amenity_mappings_on_service_id"
+  end
+
+  create_table "service_category_mappings", force: :cascade do |t|
+    t.bigint "service_id", null: false
+    t.bigint "category_type_id", null: false
+    t.string "status", default: "ACTIVE"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["category_type_id"], name: "index_service_category_mappings_on_category_type_id"
+    t.index ["service_id"], name: "index_service_category_mappings_on_service_id"
+  end
+
   create_table "service_price_details", force: :cascade do |t|
     t.bigint "service_id", null: false
     t.string "currency"
@@ -458,6 +488,26 @@ ActiveRecord::Schema.define(version: 2020_09_24_072758) do
     t.index ["person_type_id"], name: "index_service_price_details_on_person_type_id"
     t.index ["room_type_id"], name: "index_service_price_details_on_room_type_id"
     t.index ["service_id"], name: "index_service_price_details_on_service_id"
+  end
+
+  create_table "service_supplier_mappings", force: :cascade do |t|
+    t.bigint "service_id", null: false
+    t.bigint "supplier_id", null: false
+    t.string "status", default: "ACTIVE"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["service_id"], name: "index_service_supplier_mappings_on_service_id"
+    t.index ["supplier_id"], name: "index_service_supplier_mappings_on_supplier_id"
+  end
+
+  create_table "service_tc_mappings", force: :cascade do |t|
+    t.bigint "service_id", null: false
+    t.bigint "tc_id", null: false
+    t.string "status", default: "ACTIVE"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["service_id"], name: "index_service_tc_mappings_on_service_id"
+    t.index ["tc_id"], name: "index_service_tc_mappings_on_tc_id"
   end
 
   create_table "service_types", force: :cascade do |t|
@@ -626,8 +676,14 @@ ActiveRecord::Schema.define(version: 2020_09_24_072758) do
   add_foreign_key "countries", "continents"
   add_foreign_key "facilities", "service_types"
   add_foreign_key "hotdates", "hotdate_difficulties"
+  add_foreign_key "linked_services_mappings", "services"
+  add_foreign_key "linked_services_mappings", "services", column: "linked_service_id"
   add_foreign_key "roles_accesses_mappings", "accesses"
   add_foreign_key "roles_accesses_mappings", "roles"
+  add_foreign_key "service_amenity_mappings", "amenities"
+  add_foreign_key "service_amenity_mappings", "services"
+  add_foreign_key "service_category_mappings", "category_types"
+  add_foreign_key "service_category_mappings", "services"
   add_foreign_key "service_price_details", "breakfast_types"
   add_foreign_key "service_price_details", "category_types"
   add_foreign_key "service_price_details", "charge_types"
@@ -635,6 +691,10 @@ ActiveRecord::Schema.define(version: 2020_09_24_072758) do
   add_foreign_key "service_price_details", "person_types"
   add_foreign_key "service_price_details", "room_types"
   add_foreign_key "service_price_details", "services"
+  add_foreign_key "service_supplier_mappings", "companies", column: "supplier_id"
+  add_foreign_key "service_supplier_mappings", "services"
+  add_foreign_key "service_tc_mappings", "services"
+  add_foreign_key "service_tc_mappings", "terms_and_conditions", column: "tc_id"
   add_foreign_key "services", "chains"
   add_foreign_key "services", "cities"
   add_foreign_key "services", "countries"

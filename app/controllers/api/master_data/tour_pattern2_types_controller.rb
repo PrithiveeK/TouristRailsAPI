@@ -3,6 +3,12 @@ class Api::MasterData::TourPattern2TypesController < ApplicationController
 
     def index
         @tourPattern2s = TourPattern2Type.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @tourPattern2s = @tourPattern2s.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @tourPattern2s = @tourPattern2s.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @tourPattern2s}
     end
 

@@ -3,6 +3,12 @@ class Api::MasterData::CoachSizeTypesController < ApplicationController
 
     def index
         @coachSizes = CoachSizeType.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @coachSizes = @coachSizes.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @coachSizes = @coachSizes.where(coach_size: params[:name])
+        end
         render json: {code: 200, data: @coachSizes}
     end
 

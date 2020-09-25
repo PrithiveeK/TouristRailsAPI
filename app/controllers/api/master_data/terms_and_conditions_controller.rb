@@ -3,6 +3,12 @@ class Api::MasterData::TermsAndConditionsController < ApplicationController
 
     def index
        @tcs = TermsAndCondition.where(status: 'ACTIVE').order(:id)
+       if params[:id]
+        @tcs = @tcs.where(id: params[:id].to_i)
+    end
+    if params[:name]
+        @tcs = @tcs.where("terms LIKE ?", "%" + params[:name] + "%")
+    end
        render :all_tcs 
     end
     

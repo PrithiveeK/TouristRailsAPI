@@ -3,6 +3,12 @@ class Api::MasterData::ContinentsController < ApplicationController
 
     def index
         @continents = Continent.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @continents = @continents.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @continents = @continents.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @continents}
     end
 

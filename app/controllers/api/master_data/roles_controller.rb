@@ -3,6 +3,12 @@ class Api::MasterData::RolesController < ApplicationController
 
     def index
         @roles = Role.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @roles = @roles.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @roles = @roles.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @roles}
     end
 

@@ -5,6 +5,12 @@ class Api::MasterData::MarketsController < ApplicationController
 
     def index
         @markets = Market.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @markets = @markets.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @markets = @markets.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @markets}
     end
 

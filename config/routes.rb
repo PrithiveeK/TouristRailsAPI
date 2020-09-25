@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   namespace :api, defaults: { format: :json } do
     post 'users/login', to: 'authentication#login'
+    get 'users/access', to: 'authentication#get_access'
     resources :users
     resources :company do
       resources :branch

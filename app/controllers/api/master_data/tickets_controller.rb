@@ -3,6 +3,12 @@ class Api::MasterData::TicketsController < ApplicationController
 
     def index
         @tickets = Ticket.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @tickets = @tickets.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @tickets = @tickets.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @tickets}
     end
 

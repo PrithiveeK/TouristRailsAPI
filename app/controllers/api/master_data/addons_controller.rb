@@ -2,7 +2,13 @@ class Api::MasterData::AddonsController < ApplicationController
     before_action :authorize_request
 
     def index
-        @addons = Addon.where(status: 'ACTIVE').order(:id)
+        @addons = Addon.where(status: 'ACTIVE')
+        if params[:id]
+            @addons = @addons.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @addons = @addons.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render :all_addons
     end
 

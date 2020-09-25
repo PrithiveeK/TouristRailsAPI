@@ -2,8 +2,14 @@ class Api::MasterData::ChainsController < ApplicationController
     before_action :authorize_request
 
     def index
-       @chains = Chain.where(status: 'ACTIVE').order(:id)
-       render :all_chains 
+        @chains = Chain.where(status: 'ACTIVE')
+        if params[:id]
+            @chains = @chains.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @chains = @chains.where("name LIKE ?", "%" + params[:name] + "%")
+        end
+        render :all_chains 
     end
     
     def create

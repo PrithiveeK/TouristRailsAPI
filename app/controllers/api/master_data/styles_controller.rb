@@ -3,6 +3,12 @@ class Api::MasterData::StylesController < ApplicationController
 
     def index
         @styles = Style.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @styles = @styles.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @styles = @styles.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @styles}
     end
 

@@ -2,7 +2,13 @@ class Api::MasterData::CategoryTypesController < ApplicationController
     before_action :authorize_request
 
     def index
-        @categories = CategoryType.where(status: 'ACTIVE').order(:id)
+        @categories = CategoryType.where(status: 'ACTIVE')
+        if params[:id]
+            @categories = @categories.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @categories = @categories.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render :all_categories
     end
 

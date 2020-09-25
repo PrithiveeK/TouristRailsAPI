@@ -3,6 +3,12 @@ class Api::MasterData::HotdateDifficultyController < ApplicationController
 
     def index
         @hdds = HotdateDifficulty.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @hdds = @hdds.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @hdds = @hdds.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @hdds}
     end
 

@@ -3,6 +3,12 @@ class Api::MasterData::CitiesController < ApplicationController
 
     def index
         @cities = City.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @cities = @cities.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @cities = @cities.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render :all_cities
     end
 

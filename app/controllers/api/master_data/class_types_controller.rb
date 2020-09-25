@@ -3,6 +3,12 @@ class Api::MasterData::ClassTypesController < ApplicationController
 
     def index
         @classtypes = ClassType.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @classtypes = @classtypes.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @classtypes = @classtypes.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @classtypes}
     end
 

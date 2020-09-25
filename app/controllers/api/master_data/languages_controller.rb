@@ -2,8 +2,14 @@ class Api::MasterData::LanguagesController < ApplicationController
     before_action :authorize_request
 
     def index
-        @Languages = Language.where(status: 'ACTIVE').order(:id)
-        render json: {code: 200, data: @Languages}
+        @languages = Language.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @languages = @languages.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @languages = @languages.where("name LIKE ?", "%" + params[:name] + "%")
+        end
+        render json: {code: 200, data: @languages}
     end
 
     def create

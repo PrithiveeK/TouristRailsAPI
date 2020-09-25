@@ -3,6 +3,12 @@ class Api::MasterData::RoomTypesController < ApplicationController
 
     def index
         @rooms = RoomType.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @rooms = @rooms.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @rooms = @rooms.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @rooms}
     end
 

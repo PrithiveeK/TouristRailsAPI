@@ -3,6 +3,12 @@ class Api::MasterData::TitlesController < ApplicationController
 
     def index
         titles = Title.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            titles = titles.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            titles = titles.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: titles}
     end
 

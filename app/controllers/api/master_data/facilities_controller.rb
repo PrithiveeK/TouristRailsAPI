@@ -3,6 +3,12 @@ class Api::MasterData::FacilitiesController < ApplicationController
 
     def index
         @facilities = Facility.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @facilities = @facilities.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @facilities = @facilities.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render :all_facilities
     end
 

@@ -2,7 +2,13 @@ class Api::MasterData::AmenitiesController < ApplicationController
     before_action :authorize_request
 
     def index
-        @amenities = Amenity.where(status: 'ACTIVE').order(:id)
+        @amenities = Amenity.where(status: 'ACTIVE')
+        if params[:id]
+            @amenities = @amenities.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @amenities = @amenities.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render :all_amenities
     end
 

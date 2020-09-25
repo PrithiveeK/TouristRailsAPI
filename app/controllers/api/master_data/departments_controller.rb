@@ -3,6 +3,12 @@ class Api::MasterData::DepartmentsController < ApplicationController
 
     def index
         @depts = Department.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @depts = @depts.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @depts = @depts.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @depts}
     end
 

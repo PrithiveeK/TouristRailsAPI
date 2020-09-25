@@ -3,6 +3,12 @@ class Api::MasterData::MenuTypesController < ApplicationController
 
     def index
         @menus = MenuType.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @menus = @menus.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @menus = @menus.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @menus}
     end
 

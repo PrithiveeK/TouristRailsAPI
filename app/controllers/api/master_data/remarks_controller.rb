@@ -3,6 +3,12 @@ class Api::MasterData::RemarksController < ApplicationController
 
      def index
         @remarks = Remark.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @remarks = @remarks.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @remarks = @remarks.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @remarks}
     end
 

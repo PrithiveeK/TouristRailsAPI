@@ -3,6 +3,12 @@ class Api::MasterData::CountriesController < ApplicationController
 
     def index
         @countries = Country.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @countries = @countries.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @countries = @countries.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render :all_countries
     end
 

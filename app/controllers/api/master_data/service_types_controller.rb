@@ -3,6 +3,12 @@ class Api::MasterData::ServiceTypesController < ApplicationController
 
     def index
         @sts = ServiceType.where(status: 'ACTIVE').order(:id)
+        if params[:id]
+            @sts = @sts.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @sts = @sts.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @sts}
     end
 

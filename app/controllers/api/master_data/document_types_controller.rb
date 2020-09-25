@@ -2,7 +2,13 @@ class Api::MasterData::DocumentTypesController < ApplicationController
     # before_action :authorize_request
 
     def index
-        @docs = DocumentType.where(status: 'ACTIVE').order(:id)
+        @docs = DocumentType.where(status: 'ACTIVE')
+        if params[:id]
+            @docs = @docs.where(id: params[:id].to_i)
+        end
+        if params[:name]
+            @docs = @docs.where("name LIKE ?", "%" + params[:name] + "%")
+        end
         render json: {code: 200, data: @docs}
     end
 

@@ -2,7 +2,7 @@ class Api::TcController < ApplicationController
 
     def index
         @tcs = CompanyTc.left_outer_joins(:document_type, :tc).select(
-            "conpany_tcs.*, document_types.name as document_type_name,
+            "company_tcs.*, document_types.name as document_type_name,
             terms_and_conditions.terms as terms"
         ).where(company_id: params[:company_id])
         render json: {code: 200, data: @tcs}
@@ -14,7 +14,7 @@ class Api::TcController < ApplicationController
         if @newTC.valid?
             @newTC.save
             tc = CompanyTc.left_outer_joins(:document_type, :tc).select(
-                "conpany_tcs.*, document_types.name as document_type_name,
+                "company_tcs.*, document_types.name as document_type_name,
                 terms_and_conditions.terms as terms"
             ).find(@newTC.id)
             render json: {code: 201, data: tc, msg: 'Created successfully!'}
