@@ -51,7 +51,7 @@ class Api::CompanyController < ApplicationController
             contacts.telephone_no, contacts.fax, contacts.email, contacts.skype_id,
             countries.name AS country_name, cities.name AS city_name"
         ).find(params[:id])
-        render json: {code: 201, data: company}
+        render json: {code: 200, data: company}
     end 
 
     def destroy
