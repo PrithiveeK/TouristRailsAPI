@@ -1,15 +1,21 @@
 class Api::MasterData::TermsAndConditionsController < ApplicationController
     before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-       @tcs = TermsAndCondition.where(status: 'ACTIVE').order(:id)
-       if params[:id]
-        @tcs = @tcs.where(id: params[:id].to_i)
-    end
-    if params[:name]
-        @tcs = @tcs.where("terms LIKE ?", "%" + params[:name] + "%")
-    end
-       render :all_tcs 
+        filter = "terms_and_conditions.status = 'ACTIVE'"
+        filter += " and terms_and_conditions.id = #{params[:id].to_i}" if params[:id]
+        filter += " and terms_and_conditions.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        terms_and_conditions = TermsAndCondition.joins(
+            'LEFT OUTER JOIN markets AS from_market ON terms_and_conditions.from_market_id = from_market.id',
+            'LEFT OUTER JOIN markets AS to_market ON terms_and_conditions.to_market_id = to_market.id'
+        ).select(
+            "terms_and_conditions.*, from_market.name as from_market_name, to_market.name as to_market_name"
+        ).where(filter)
+
+        render json: {code: 200, data: terms_and_conditions, msg: 'Fetched Successfully'}
     end
     
     def create

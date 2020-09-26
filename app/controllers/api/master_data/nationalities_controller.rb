@@ -1,15 +1,16 @@
 class Api::MasterData::NationalitiesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @nationalities = Nationality.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @nationalities = @nationalities.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @nationalities = @nationalities.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @nationalities}
+        filter = "nationalities.status = 'ACTIVE'"
+        filter += " and nationalities.id = #{params[:id].to_i}" if params[:id]
+        filter += " and nationalities.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        nationalities = Nationality.where(filter)
+
+        render json: {code: 200, data: nationalities, msg: 'Fetched Successfully'}
     end
 
     def create

@@ -1,15 +1,16 @@
 class Api::MasterData::LocationTypesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @lts = LocationType.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @lts = @lts.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @lts = @lts.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @lts}
+        filter = "location_types.status = 'ACTIVE'"
+        filter += " and location_types.id = #{params[:id].to_i}" if params[:id]
+        filter += " and location_types.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        location_types = LocationType.where(filter)
+
+        render json: {code: 200, data: location_types, msg: 'Fetched Successfully'}
     end
 
     def create

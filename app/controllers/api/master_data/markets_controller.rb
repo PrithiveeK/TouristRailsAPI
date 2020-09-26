@@ -1,17 +1,16 @@
-require 'csv'
-
 class Api::MasterData::MarketsController < ApplicationController
     before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @markets = Market.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @markets = @markets.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @markets = @markets.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @markets}
+        filter = "markets.status = 'ACTIVE'"
+        filter += " and markets.id = #{params[:id].to_i}" if params[:id]
+        filter += " and markets.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        markets = Market.where(filter)
+
+        render json: {code: 200, data: markets, msg: 'Fetched Successfully'}
     end
 
     def create
@@ -44,21 +43,6 @@ class Api::MasterData::MarketsController < ApplicationController
             market.destroy
             render json: {code: 200, msg: 'Deleted Successfully!'}    
         else
-            render json: {code: 500, msg: 'Something went wrong. Please, Try again!'}
-        end
-    end
-
-    def insertFromCSV
-        begin
-            table = CSV.parse(File.read(fileName), headers: true)
-            table.each do |row|
-                newMarket = Market.create(name: rows["name"], description: row["description"])
-                if newMarket.valid?
-                    newMarket.save
-                end
-            end
-            render json: {code: 201, msg: 'Successfully inserted data'}
-        rescue => exception
             render json: {code: 500, msg: 'Something went wrong. Please, Try again!'}
         end
     end

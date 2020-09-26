@@ -1,15 +1,16 @@
 class Api::MasterData::CompanyTypesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @companys = CompanyType.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @companys = @companys.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @companys = @companys.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @companys}
+        filter = "company_types.status = 'ACTIVE'"
+        filter += " and company_types.id = #{params[:id].to_i}" if params[:id]
+        filter += " and company_types.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        company_types = CompanyType.where(filter)
+
+        render json: {code: 200, data: company_types, msg: 'Fetched Successfully'}
     end
 
     def create

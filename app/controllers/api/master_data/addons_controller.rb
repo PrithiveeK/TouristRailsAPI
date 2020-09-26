@@ -1,15 +1,18 @@
 class Api::MasterData::AddonsController < ApplicationController
     before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @addons = Addon.where(status: 'ACTIVE')
-        if params[:id]
-            @addons = @addons.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @addons = @addons.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render :all_addons
+        filter = "addons.status = 'ACTIVE'"
+        filter += " and addons.id = #{params[:id].to_i}" if params[:id]
+        filter += " and addons.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        addons = Addon.left_outer_join(:service_type).select(
+            "addons.*, service_types.name as service_type_name"
+        ).where(filter)
+
+        render json: {code: 200, data: addons, msg: 'Fetched Successfully'}
     end
 
     def create

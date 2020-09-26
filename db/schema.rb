@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_25_100733) do
+ActiveRecord::Schema.define(version: 2020_09_26_115424) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "accesses", force: :cascade do |t|
     t.string "name", null: false
-    t.string "type", null: false
+    t.string "access_type", null: false
     t.string "status", default: "ACTIVE"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -627,6 +627,16 @@ ActiveRecord::Schema.define(version: 2020_09_25_100733) do
     t.index ["name"], name: "index_tour_pattern_types_on_name", unique: true
   end
 
+  create_table "user_access_mappings", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "access_id", null: false
+    t.string "status", default: "ACTIVE"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["access_id"], name: "index_user_access_mappings_on_access_id"
+    t.index ["user_id"], name: "index_user_access_mappings_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "first_name"
     t.string "sur_name"
@@ -704,6 +714,8 @@ ActiveRecord::Schema.define(version: 2020_09_25_100733) do
   add_foreign_key "services", "styles"
   add_foreign_key "terms_and_conditions", "markets", column: "from_market_id"
   add_foreign_key "terms_and_conditions", "markets", column: "to_market_id"
+  add_foreign_key "user_access_mappings", "accesses"
+  add_foreign_key "user_access_mappings", "users"
   add_foreign_key "users", "companies"
   add_foreign_key "users", "contacts"
   add_foreign_key "users", "departments"

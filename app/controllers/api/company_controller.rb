@@ -1,5 +1,7 @@
 class Api::CompanyController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :super_company_search_view_access ,only: [:index, :show]
+    before_action :super_company_add_edit_access, only: [:create, :update, :destroy]
 
     def index
         @companies = Company.left_outer_joins(

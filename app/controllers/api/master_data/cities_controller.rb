@@ -1,15 +1,18 @@
 class Api::MasterData::CitiesController < ApplicationController
     before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @cities = City.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @cities = @cities.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @cities = @cities.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render :all_cities
+        filter = "cities.status = 'ACTIVE'"
+        filter += " and cities.id = #{params[:id].to_i}" if params[:id]
+        filter += " and cities.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        cities = Addon.left_outer_join(:country).select(
+            "cities.*, countries.name as country_name"
+        ).where(filter)
+
+        render json: {code: 200, data: cities, msg: 'Fetched Successfully'}
     end
 
     def create

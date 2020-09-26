@@ -1,15 +1,16 @@
 class Api::MasterData::RemarksController < ApplicationController
-     # before_action :authorize_request
+     before_action :authorize_request
+     before_action :master_data_search_view_access ,only: [:index, :show]
+     before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
      def index
-        @remarks = Remark.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @remarks = @remarks.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @remarks = @remarks.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @remarks}
+        filter = "remarks.status = 'ACTIVE'"
+        filter += " and remarks.id = #{params[:id].to_i}" if params[:id]
+        filter += " and remarks.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        remarks = Remark.where(filter)
+
+        render json: {code: 200, data: remarks, msg: 'Fetched Successfully'}
     end
 
     def create

@@ -1,7 +1,16 @@
 class Api::MasterData::RatingTypesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
+        filter = "rating_types.status = 'ACTIVE'"
+        filter += " and rating_types.id = #{params[:id].to_i}" if params[:id]
+        filter += " and rating_types.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        rating_types = RatingType.where(filter)
+
+        render json: {code: 200, data: rating_types, msg: 'Fetched Successfully'}
         @ratings = RatingType.where(status: 'ACTIVE').order(:id)
         if params[:id]
             @ratings = @ratings.where(id: params[:id].to_i)

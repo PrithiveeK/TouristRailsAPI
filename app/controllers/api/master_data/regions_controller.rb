@@ -1,15 +1,16 @@
 class Api::MasterData::RegionsController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @regions = Region.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @regions = @regions.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @regions = @regions.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @regions}
+        filter = "regions.status = 'ACTIVE'"
+        filter += " and regions.id = #{params[:id].to_i}" if params[:id]
+        filter += " and regions.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        regions = Region.where(filter)
+
+        render json: {code: 200, data: regions, msg: 'Fetched Successfully'}
     end
 
     def create

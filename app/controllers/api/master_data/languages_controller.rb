@@ -1,15 +1,16 @@
 class Api::MasterData::LanguagesController < ApplicationController
     before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @languages = Language.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @languages = @languages.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @languages = @languages.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @languages}
+        filter = "languages.status = 'ACTIVE'"
+        filter += " and languages.id = #{params[:id].to_i}" if params[:id]
+        filter += " and languages.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        languages = Language.where(filter)
+
+        render json: {code: 200, data: languages, msg: 'Fetched Successfully'}
     end
 
     def create

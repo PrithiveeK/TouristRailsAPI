@@ -1,15 +1,17 @@
 class Api::MasterData::CurrenciesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @currencies = Currency.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @currencies = @currencies.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @currencies = @currencies.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @currencies}
+        filter = "currencies.status = 'ACTIVE'"
+        filter += " and currencies.id = #{params[:id].to_i}" if params[:id]
+        filter += " and currencies.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        currencies = Currency.where(filter)
+
+        render json: {code: 200, data: currencies, msg: 'Fetched Successfully'}
+
     end
 
     def create

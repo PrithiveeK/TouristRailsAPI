@@ -1,15 +1,16 @@
 class Api::MasterData::DocumentTypesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @docs = DocumentType.where(status: 'ACTIVE')
-        if params[:id]
-            @docs = @docs.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @docs = @docs.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @docs}
+        filter = "document_types.status = 'ACTIVE'"
+        filter += " and document_types.id = #{params[:id].to_i}" if params[:id]
+        filter += " and document_types.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        document_types = DocumentType.where(filter)
+
+        render json: {code: 200, data: document_types, msg: 'Fetched Successfully'}
     end
 
     def create

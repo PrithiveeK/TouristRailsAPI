@@ -1,15 +1,16 @@
 class Api::MasterData::PersonTypesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @pts = PersonType.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @pts = @pts.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @pts = @pts.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @pts}
+        filter = "person_types.status = 'ACTIVE'"
+        filter += " and person_types.id = #{params[:id].to_i}" if params[:id]
+        filter += " and person_types.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        person_types = PersonType.where(filter)
+
+        render json: {code: 200, data: person_types, msg: 'Fetched Successfully'}
     end
 
     def create

@@ -1,15 +1,16 @@
 class Api::MasterData::SupplierTypesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @sts = SupplierType.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @sts = @sts.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @sts = @sts.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @sts}
+        filter = "supplier_types.status = 'ACTIVE'"
+        filter += " and supplier_types.id = #{params[:id].to_i}" if params[:id]
+        filter += " and supplier_types.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        supplier_types = SupplierType.where(filter)
+
+        render json: {code: 200, data: supplier_types, msg: 'Fetched Successfully'}
     end
 
     def create

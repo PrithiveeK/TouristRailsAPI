@@ -1,15 +1,16 @@
 class Api::MasterData::CoachSizeTypesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @coachSizes = CoachSizeType.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @coachSizes = @coachSizes.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @coachSizes = @coachSizes.where(coach_size: params[:name])
-        end
-        render json: {code: 200, data: @coachSizes}
+        filter = "coach_size_types.status = 'ACTIVE'"
+        filter += " and coach_size_types.id = #{params[:id].to_i}" if params[:id]
+        filter += " and coach_size_types.coach_size = '#{params[:name]}'" if params[:name]
+
+        coach_size_types = CoachSizeType.where(filter)
+
+        render json: {code: 200, data: coach_size_types, msg: 'Fetched Successfully'}
     end
 
     def create

@@ -1,15 +1,16 @@
 class Api::MasterData::TicketsController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @tickets = Ticket.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @tickets = @tickets.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @tickets = @tickets.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @tickets}
+        filter = "tickets.status = 'ACTIVE'"
+        filter += " and tickets.id = #{params[:id].to_i}" if params[:id]
+        filter += " and tickets.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        tickets = Ticket.where(filter)
+
+        render json: {code: 200, data: tickets, msg: 'Fetched Successfully'}
     end
 
     def create

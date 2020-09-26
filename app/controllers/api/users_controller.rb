@@ -1,5 +1,5 @@
 class Api::UsersController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
 
     def create
         create_user[:password] = '12345678'
@@ -40,23 +40,6 @@ class Api::UsersController < ApplicationController
             :title_id,
             :service_type_id,
             :code
-        )
-    end
-
-    def create_contact
-        params.require(:contacts).permit(
-            :country_id,
-            :city_id,
-            :zipcode,
-            :phone_no,
-            :email,
-            :fax,
-            :telephone_no,
-            :address_line_1,
-            :address_line_2,
-            :street,
-            :skype_id,
-            :website
         )
     end
 end

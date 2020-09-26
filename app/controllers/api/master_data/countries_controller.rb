@@ -1,15 +1,18 @@
 class Api::MasterData::CountriesController < ApplicationController
     before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @countries = Country.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @countries = @countries.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @countries = @countries.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render :all_countries
+        filter = "countries.status = 'ACTIVE'"
+        filter += " and countries.id = #{params[:id].to_i}" if params[:id]
+        filter += " and countries.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        countries = Country.left_outer_join(:continent).select(
+            "countries.*, continents.name as continent_name"
+        ).where(filter)
+
+        render json: {code: 200, data: countries, msg: 'Fetched Successfully'}
     end
 
     def create

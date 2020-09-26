@@ -1,15 +1,16 @@
 class Api::MasterData::MenuTypesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @menus = MenuType.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @menus = @menus.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @menus = @menus.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @menus}
+        filter = "menu_types.status = 'ACTIVE'"
+        filter += " and menu_types.id = #{params[:id].to_i}" if params[:id]
+        filter += " and menu_types.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        menu_types = MenuType.where(filter)
+
+        render json: {code: 200, data: menu_types, msg: 'Fetched Successfully'}
     end
 
     def create

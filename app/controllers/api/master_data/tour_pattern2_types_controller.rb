@@ -1,15 +1,16 @@
 class Api::MasterData::TourPattern2TypesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @tourPattern2s = TourPattern2Type.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @tourPattern2s = @tourPattern2s.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @tourPattern2s = @tourPattern2s.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @tourPattern2s}
+        filter = "tour_pattern2_types.status = 'ACTIVE'"
+        filter += " and tour_pattern2_types.id = #{params[:id].to_i}" if params[:id]
+        filter += " and tour_pattern2_types.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        tour_pattern2_types = TourPattern2Type.where(filter)
+
+        render json: {code: 200, data: tour_pattern2_types, msg: 'Fetched Successfully'}
     end
 
     def create

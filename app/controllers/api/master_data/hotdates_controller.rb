@@ -1,15 +1,16 @@
 class Api::MasterData::HotdatesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @hotDates = Hotdate.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @hotdates = @hotdates.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @hotdates = @hotdates.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @hotDates}
+        filter = "hotdates.status = 'ACTIVE'"
+        filter += " and hotdates.id = #{params[:id].to_i}" if params[:id]
+        filter += " and hotdates.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        hotdates = Hotdate.where(filter)
+
+        render json: {code: 200, data: hotdates, msg: 'Fetched Successfully'}
     end
 
     def create

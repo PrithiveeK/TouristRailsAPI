@@ -1,15 +1,16 @@
 class Api::MasterData::ContinentsController < ApplicationController
     before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @continents = Continent.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @continents = @continents.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @continents = @continents.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @continents}
+        filter = "continents.status = 'ACTIVE'"
+        filter += " and continents.id = #{params[:id].to_i}" if params[:id]
+        filter += " and continents.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        continents = Continent.where(filter)
+
+        render json: {code: 200, data: continents, msg: 'Fetched Successfully'}
     end
 
     def create

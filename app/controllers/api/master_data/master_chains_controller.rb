@@ -1,15 +1,16 @@
 class Api::MasterData::MasterChainsController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @masterchains = MasterChain.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @masterchains = @masterchains.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @masterchains = @masterchains.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @masterchains}
+        filter = "master_chains.status = 'ACTIVE'"
+        filter += " and master_chains.id = #{params[:id].to_i}" if params[:id]
+        filter += " and master_chains.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        master_chains = MasterChain.where(filter)
+
+        render json: {code: 200, data: master_chains, msg: 'Fetched Successfully'}
     end
 
     def create

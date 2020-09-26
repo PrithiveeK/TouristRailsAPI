@@ -1,15 +1,18 @@
 class Api::MasterData::AmenitiesController < ApplicationController
     before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @amenities = Amenity.where(status: 'ACTIVE')
-        if params[:id]
-            @amenities = @amenities.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @amenities = @amenities.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render :all_amenities
+        filter = "amenities.status = 'ACTIVE'"
+        filter += " and amenities.id = #{params[:id].to_i}" if params[:id]
+        filter += " and amenities.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        amenities = Amenity.left_outer_join(:service_type).select(
+            "amenities.*, service_types.name as service_type_name"
+        ).where(filter)
+
+        render json: {code: 200, data: amenities, msg: 'Fetched Successfully'}
     end
 
     def create

@@ -1,15 +1,18 @@
 class Api::MasterData::CategoryTypesController < ApplicationController
     before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @categories = CategoryType.where(status: 'ACTIVE')
-        if params[:id]
-            @categories = @categories.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @categories = @categories.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render :all_categories
+        filter = "category_types.status = 'ACTIVE'"
+        filter += " and category_types.id = #{params[:id].to_i}" if params[:id]
+        filter += " and category_types.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        category_types = CategoryType.left_outer_join(:service_type).select(
+            "category_types.*, service_types.name as service_type_name"
+        ).where(filter)
+
+        render json: {code: 200, data: category_types, msg: 'Fetched Successfully'}
     end
 
     def create

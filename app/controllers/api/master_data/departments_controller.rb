@@ -1,15 +1,16 @@
 class Api::MasterData::DepartmentsController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @depts = Department.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @depts = @depts.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @depts = @depts.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @depts}
+        filter = "departments.status = 'ACTIVE'"
+        filter += " and departments.id = #{params[:id].to_i}" if params[:id]
+        filter += " and departments.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        departments = Department.where(filter)
+
+        render json: {code: 200, data: departments, msg: 'Fetched Successfully'}
     end
 
     def create

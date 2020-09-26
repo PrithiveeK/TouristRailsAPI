@@ -1,15 +1,16 @@
 class Api::MasterData::ChargeTypesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @cts = ChargeType.where(status: 'ACTIVE')
-        if params[:id]
-            @cts = @cts.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @cts = @cts.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @cts}
+        filter = "charge_types.status = 'ACTIVE'"
+        filter += " and charge_types.id = #{params[:id].to_i}" if params[:id]
+        filter += " and charge_types.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        charge_types = ChargeType.where(filter)
+
+        render json: {code: 200, data: charge_types, msg: 'Fetched Successfully'}
     end
 
     def create

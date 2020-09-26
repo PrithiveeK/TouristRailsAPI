@@ -1,15 +1,18 @@
 class Api::MasterData::FacilitiesController < ApplicationController
     before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @facilities = Facility.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @facilities = @facilities.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @facilities = @facilities.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render :all_facilities
+        filter = "facilities.status = 'ACTIVE'"
+        filter += " and facilities.id = #{params[:id].to_i}" if params[:id]
+        filter += " and facilities.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        facilities = Facility.left_outer_join(:service_type).select(
+            "facilities.*, service_types.name as service_type_name"
+        ).where(filter)
+
+        render json: {code: 200, data: facilities, msg: 'Fetched Successfully'}
     end
 
     def create

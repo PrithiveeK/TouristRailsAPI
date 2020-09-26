@@ -1,15 +1,16 @@
 class Api::MasterData::StylesController < ApplicationController
-    # before_action :authorize_request
+    before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        @styles = Style.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @styles = @styles.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @styles = @styles.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @styles}
+        filter = "styles.status = 'ACTIVE'"
+        filter += " and styles.id = #{params[:id].to_i}" if params[:id]
+        filter += " and styles.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        styles = Style.where(filter)
+
+        render json: {code: 200, data: styles, msg: 'Fetched Successfully'}
     end
 
     def create

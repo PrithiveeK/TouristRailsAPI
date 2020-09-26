@@ -1,15 +1,16 @@
 class Api::MasterData::TitlesController < ApplicationController
     before_action :authorize_request
+    before_action :master_data_search_view_access ,only: [:index, :show]
+    before_action :master_data_add_edit_access, only: [:create, :update, :destroy]
 
     def index
-        titles = Title.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            titles = titles.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            titles = titles.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: titles}
+        filter = "titles.status = 'ACTIVE'"
+        filter += " and titles.id = #{params[:id].to_i}" if params[:id]
+        filter += " and titles.name LIKE = '%#{params[:name]}%'" if params[:name]
+
+        titles = Title.where(filter)
+
+        render json: {code: 200, data: titles, msg: 'Fetched Successfully'}
     end
 
     def create
