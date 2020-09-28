@@ -8,7 +8,7 @@ class Api::MasterData::AmenitiesController < ApplicationController
         filter += " and amenities.id = #{params[:id].to_i}" if params[:id]
         filter += " and amenities.name LIKE = '%#{params[:name]}%'" if params[:name]
 
-        amenities = Amenity.left_outer_join(:service_type).select(
+        amenities = Amenity.left_outer_joins(:service_type).select(
             "amenities.*, service_types.name as service_type_name"
         ).where(filter)
 

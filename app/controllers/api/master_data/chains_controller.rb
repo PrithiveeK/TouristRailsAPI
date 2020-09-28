@@ -8,7 +8,7 @@ class Api::MasterData::ChainsController < ApplicationController
         filter += " and chains.id = #{params[:id].to_i}" if params[:id]
         filter += " and chains.name LIKE = '%#{params[:name]}%'" if params[:name]
 
-        chains = Chain.left_outer_join(:service_type, :master_chain).select(
+        chains = Chain.left_outer_joins(:service_type, :master_chain).select(
             "chains.*, service_types.name as service_type_name, master_chains.name as master_chain_name"
         ).where(filter)
 

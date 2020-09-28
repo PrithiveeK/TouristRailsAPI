@@ -8,7 +8,7 @@ class Api::MasterData::FacilitiesController < ApplicationController
         filter += " and facilities.id = #{params[:id].to_i}" if params[:id]
         filter += " and facilities.name LIKE = '%#{params[:name]}%'" if params[:name]
 
-        facilities = Facility.left_outer_join(:service_type).select(
+        facilities = Facility.left_outer_joins(:service_type).select(
             "facilities.*, service_types.name as service_type_name"
         ).where(filter)
 

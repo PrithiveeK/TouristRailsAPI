@@ -8,7 +8,7 @@ class Api::MasterData::CountriesController < ApplicationController
         filter += " and countries.id = #{params[:id].to_i}" if params[:id]
         filter += " and countries.name LIKE = '%#{params[:name]}%'" if params[:name]
 
-        countries = Country.left_outer_join(:continent).select(
+        countries = Country.left_outer_joins(:continent).select(
             "countries.*, continents.name as continent_name"
         ).where(filter)
 

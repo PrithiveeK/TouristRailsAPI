@@ -8,7 +8,7 @@ class Api::MasterData::AddonsController < ApplicationController
         filter += " and addons.id = #{params[:id].to_i}" if params[:id]
         filter += " and addons.name LIKE = '%#{params[:name]}%'" if params[:name]
 
-        addons = Addon.left_outer_join(:service_type).select(
+        addons = Addon.left_outer_joins(:service_type).select(
             "addons.*, service_types.name as service_type_name"
         ).where(filter)
 

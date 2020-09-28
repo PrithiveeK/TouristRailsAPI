@@ -8,7 +8,7 @@ class Api::MasterData::CategoryTypesController < ApplicationController
         filter += " and category_types.id = #{params[:id].to_i}" if params[:id]
         filter += " and category_types.name LIKE = '%#{params[:name]}%'" if params[:name]
 
-        category_types = CategoryType.left_outer_join(:service_type).select(
+        category_types = CategoryType.left_outer_joins(:service_type).select(
             "category_types.*, service_types.name as service_type_name"
         ).where(filter)
 

@@ -8,7 +8,7 @@ class Api::MasterData::CitiesController < ApplicationController
         filter += " and cities.id = #{params[:id].to_i}" if params[:id]
         filter += " and cities.name LIKE = '%#{params[:name]}%'" if params[:name]
 
-        cities = Addon.left_outer_join(:country).select(
+        cities = Addon.left_outer_joins(:country).select(
             "cities.*, countries.name as country_name"
         ).where(filter)
 
