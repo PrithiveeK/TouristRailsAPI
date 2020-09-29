@@ -11,14 +11,6 @@ class Api::MasterData::RatingTypesController < ApplicationController
         rating_types = RatingType.where(filter)
 
         render json: {code: 200, data: rating_types, msg: 'Fetched Successfully'}
-        @ratings = RatingType.where(status: 'ACTIVE').order(:id)
-        if params[:id]
-            @ratings = @ratings.where(id: params[:id].to_i)
-        end
-        if params[:name]
-            @ratings = @ratings.where("name LIKE ?", "%" + params[:name] + "%")
-        end
-        render json: {code: 200, data: @ratings}
     end
 
     def create
